@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manager Dashboard</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+<script src="firebase-config.js"></script>
+
+</head>
+
+<body>
+
+<h1>Manager Dashboard</h1>
+
+<form id="jobForm">
+
+<label>Driver Name</label><br>
+<input type="text" id="driver"><br><br>
+
+<label>Truck Number</label><br>
+<input type="text" id="truck"><br><br>
+
+<label>Pickup Location</label><br>
+<input type="text" id="pickup"><br><br>
+
+<label>Cargo Details</label><br>
+<textarea id="cargo"></textarea><br><br>
+
+<label>PDF Attachment</label><br>
+<input type="file" id="pdfFile"><br><br>
+
+<button type="submit">Assign Job</button>
+
+</form>
+
+<script>
+
+document.getElementById("jobForm").addEventListener("submit", async (e) => {
+
+e.preventDefault();
+
+const driver = document.getElementById("driver").value;
+const truck = document.getElementById("truck").value;
+const pickup = document.getElementById("pickup").value;
+const cargo = document.getElementById("cargo").value;
+
+const file = document.getElementById("pdfFile").files[0];
+
+let pdfURL = "";
+
+if(file){
+
+const storageRef = storage.ref("pdfs/" + file.name);
+
+await storageRef.put(file);
+
+pdfURL = await storageRef.getDownloadURL();
+
+}
+
+await db.collection("jobs").add({
+
+driver,
+truck,
+pickup,
+cargo,
+pdfURL,
+createdAt: new Date()
+
+});
+
+alert("Job Assigned Successfully");
+
+document.getElementById("jobForm").reset();
+
+});
+
+</script>
+
+</body>
+</html>
